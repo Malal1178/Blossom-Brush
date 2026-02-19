@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ShoppingCart, Upload, Save } from "lucide-react";
 import { useCart } from "./CartContext";
+import { useToast } from "@/contexts/ToastContext";
 
 interface GalleryItem {
     type: "emoji" | "image";
@@ -29,7 +30,8 @@ interface GalleryPopupProps {
 }
 
 export default function GalleryPopup({ isOpen, onClose, item, onUpdate, isAdmin, subtitleOptions = [], onUpdateOptions, onDelete }: GalleryPopupProps) {
-    const { addToCart } = useCart();
+    const { addToCart, cart } = useCart();
+    const { showToast } = useToast();
     const [isEditing, setIsEditing] = useState(false);
     const [editedName, setEditedName] = useState(item.name || "Untitled Artwork");
     const [editedPrice, setEditedPrice] = useState(item.price || 50);
@@ -50,14 +52,21 @@ export default function GalleryPopup({ isOpen, onClose, item, onUpdate, isAdmin,
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleAddToCart = () => {
+        const isDuplicate = cart.some(cartItem => cartItem.name === editedName);
+
+        if (isDuplicate) {
+            showToast(`${editedName} is already in the cart`);
+            return;
+        }
+
         addToCart({
             id: Date.now().toString(),
             name: editedName,
             image: editedContent,
             price: editedPrice
         });
+        showToast(`${editedName} has been added to the cart`);
         onClose();
-        // Ideally show a toast notification here
     };
 
     const handleSave = () => {

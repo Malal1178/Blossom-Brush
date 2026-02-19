@@ -42,7 +42,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     const addToCart = (item: CartItem) => {
         setCart((prev) => [...prev, item]);
-        setIsCartOpen(true); // Open cart when adding item
+        // setIsCartOpen(true); // Disable auto-open
     };
 
     const removeFromCart = (id: string) => {

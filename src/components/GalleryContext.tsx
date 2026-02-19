@@ -64,12 +64,12 @@ const defaultItems: GalleryItem[] = [
 ];
 
 const defaultFramePositions: FramePosition[] = [
-    { x: '28%', y: '31%', width: '11%', height: '15%' }, // Frame 0: Left top
-    { x: '38.5%', y: '26%', width: '12.5%', height: '16.5%' }, // Frame 1: Center-left top
-    { x: '51.5%', y: '26%', width: '12.5%', height: '16.5%' }, // Frame 2: Center-right top
-    { x: '63%', y: '31%', width: '11%', height: '15%' }, // Frame 3: Right top
-    { x: '36%', y: '46%', width: '11.5%', height: '16%' }, // Frame 4: Center-left bottom
-    { x: '53%', y: '46%', width: '11.5%', height: '16%' }, // Frame 5: Center-right bottom
+    { x: '35.66%', y: '29.34%', width: '6%', height: '10%' }, // Frame 1
+    { x: '43.70%', y: '23.19%', width: '6%', height: '10%' }, // Frame 2
+    { x: '53.81%', y: '23.01%', width: '6%', height: '10%' }, // Frame 3
+    { x: '61.72%', y: '28.88%', width: '6%', height: '10%' }, // Frame 4
+    { x: '42.95%', y: '37.13%', width: '6%', height: '10%' }, // Frame 5
+    { x: '54.91%', y: '36.58%', width: '6%', height: '10%' }, // Frame 6
 ];
 
 export function GalleryProvider({ children }: { children: ReactNode }) {

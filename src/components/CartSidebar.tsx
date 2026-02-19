@@ -4,9 +4,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Trash2, ShoppingBag } from "lucide-react";
 import { useCart } from "./CartContext";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function CartSidebar() {
     const { isCartOpen, toggleCart, cart, removeFromCart, clearCart } = useCart();
+    const router = useRouter();
 
     const totalPrice = cart.reduce((total, item) => total + (item.price || 0), 0);
 
@@ -95,7 +97,10 @@ export default function CartSidebar() {
                                     <span className="text-[#5D4037] font-bold text-2xl">${totalPrice}</span>
                                 </div>
                                 <button
-                                    onClick={() => alert("Checkout functionality coming soon!")}
+                                    onClick={() => {
+                                        toggleCart();
+                                        router.push("/checkout");
+                                    }}
                                     className="w-full py-4 bg-[#FFB7C5] text-[#5D4037] font-bold rounded-xl shadow-lg hover:bg-[#5D4037] hover:text-white transition-all transform hover:scale-[1.02] active:scale-[0.98]"
                                 >
                                     Proceed to Checkout
