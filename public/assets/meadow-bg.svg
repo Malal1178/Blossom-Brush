@@ -1,0 +1,47 @@
+<svg viewBox="0 0 1920 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <g id="flower1">
+      <path d="M0 -15 Q 10 -30 20 -15 Q 30 0 15 10 Q 0 20 -15 10 Q -30 0 -20 -15 Q -10 -30 0 -15" fill="#FFB7C5" />
+      <circle cx="0" cy="0" r="5" fill="#FFF" />
+    </g>
+    <g id="flower2">
+      <path d="M0 -10 Q 8 -20 16 -10 Q 20 0 10 8 Q 0 16 -10 8 Q -20 0 -16 -10 Q -8 -20 0 -10" fill="#FFF" />
+      <circle cx="0" cy="0" r="4" fill="#FFD700" />
+    </g>
+    <g id="flower3">
+       <circle cx="0" cy="-8" r="8" fill="#E6E6FA" />
+       <circle cx="7" cy="-4" r="8" fill="#E6E6FA" />
+       <circle cx="7" cy="4" r="8" fill="#E6E6FA" />
+       <circle cx="0" cy="8" r="8" fill="#E6E6FA" />
+       <circle cx="-7" cy="4" r="8" fill="#E6E6FA" />
+       <circle cx="-7" cy="-4" r="8" fill="#E6E6FA" />
+       <circle cx="0" cy="0" r="4" fill="#FFD700" />
+    </g>
+  </defs>
+  
+  <!-- Green Hill -->
+  <path d="M0 600 L0 400 Q 480 350 960 450 Q 1440 550 1920 400 L 1920 600 Z" fill="#98FB98" opacity="0.4" />
+  <path d="M0 600 L0 450 Q 400 420 800 480 Q 1200 540 1920 450 L 1920 600 Z" fill="#bcecc0" opacity="0.5" />
+
+  <!-- Flowers scattered -->
+  <use href="#flower1" x="100" y="500" transform="scale(0.8)" />
+  <use href="#flower2" x="250" y="550" transform="scale(0.9)" />
+  <use href="#flower3" x="400" y="520" transform="scale(0.7)" />
+  <use href="#flower1" x="550" y="560" transform="scale(1.0)" />
+  <use href="#flower2" x="700" y="510" transform="scale(0.8)" />
+  <use href="#flower3" x="850" y="540" transform="scale(0.9)" />
+  <use href="#flower1" x="1000" y="500" transform="scale(0.7)" />
+  <use href="#flower2" x="1150" y="550" transform="scale(0.9)" />
+  <use href="#flower3" x="1300" y="520" transform="scale(0.8)" />
+  <use href="#flower1" x="1450" y="560" transform="scale(1.0)" />
+  <use href="#flower2" x="1600" y="510" transform="scale(0.8)" />
+  <use href="#flower3" x="1750" y="540" transform="scale(0.9)" />
+  
+  <use href="#flower2" x="150" y="450" transform="scale(0.6)" />
+  <use href="#flower3" x="300" y="480" transform="scale(0.5)" />
+  <use href="#flower1" x="600" y="460" transform="scale(0.6)" />
+  <use href="#flower2" x="900" y="440" transform="scale(0.5)" />
+  <use href="#flower3" x="1200" y="470" transform="scale(0.6)" />
+  <use href="#flower1" x="1500" y="450" transform="scale(0.5)" />
+  <use href="#flower2" x="1800" y="460" transform="scale(0.6)" />
+</svg>

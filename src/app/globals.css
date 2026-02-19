@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cream: #FDFBF7;
+  --color-blossom: #FFB7C5;
+  --color-sage: #98FB98;
+  --color-earth: #5D4037;
+
+  --font-quicksand: var(--font-quicksand);
+
+  --font-sans: var(--font-quicksand);
+}
+
+:root {
+  --background: var(--color-cream);
+  --foreground: var(--color-earth);
+}
+
+body {
+  background-color: var(--background);
+  background-image: url('/assets/bg-pattern.svg');
+  background-size: 60px 60px;
+  color: var(--foreground);
+  font-family: var(--font-quicksand), sans-serif;
+}
+
+@keyframes sway {
+
+  0%,
+  100% {
+    transform: rotate(-3deg);
+  }
+
+  50% {
+    transform: rotate(3deg);
+  }
+}
+
+.animate-sway {
+  animation: sway 6s ease-in-out infinite;
+}
+
+/* Expanding Search Bar */
+.searchBox {
+  display: flex;
+  align-items: center;
+  background: #FFB6C1;
+  border-radius: 40px;
+  padding: 5px;
+  transition: 0.4s;
+}
+
+.searchBox:hover > .searchInput,
+.searchBox:focus-within > .searchInput {
+  width: 200px;
+  padding: 0 10px;
+}
+
+.searchButton {
+  background: #FFB6C1;
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: 0.4s;
+  padding: 8px;
+}
+
+.searchInput {
+  border: none;
+  background: none;
+  outline: none;
+  padding: 0;
+  color: #5D4037;
+  font-size: 16px;
+  transition: 0.4s;
+  width: 0px;
+  overflow: hidden;
+}

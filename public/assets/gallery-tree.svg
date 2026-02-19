@@ -1,0 +1,14 @@
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Trunk -->
+  <path d="M400 550 C 350 500, 350 400, 400 300 C 450 400, 450 500, 400 550" fill="#5D4037" />
+  <!-- Branches -->
+  <path d="M400 300 Q 300 200 200 250" stroke="#5D4037" stroke-width="20" fill="none" />
+  <path d="M400 300 Q 500 200 600 250" stroke="#5D4037" stroke-width="20" fill="none" />
+  <path d="M400 300 Q 400 150 400 100" stroke="#5D4037" stroke-width="20" fill="none" />
+  <!-- Blossoms -->
+  <circle cx="200" cy="250" r="40" fill="#FFB7C5" opacity="0.8" />
+  <circle cx="600" cy="250" r="40" fill="#FFB7C5" opacity="0.8" />
+  <circle cx="400" cy="100" r="50" fill="#FFB7C5" opacity="0.8" />
+  <circle cx="300" cy="200" r="30" fill="#FFB7C5" opacity="0.8" />
+  <circle cx="500" cy="200" r="30" fill="#FFB7C5" opacity="0.8" />
+</svg>
