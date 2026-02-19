@@ -29,7 +29,7 @@ const PETAL_PATHS = [
 
 export default function SakuraBackground() {
     const [petals, setPetals] = useState<Petal[]>([]);
-    const requestRef = useRef<number>();
+    const requestRef = useRef<number | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const petalsRef = useRef<Petal[]>([]); // Mutable ref for animation loop to avoid re-renders impacting logic
 
