@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { db, storage } from "../lib/firebase";
 import { collection, doc, onSnapshot, setDoc, addDoc, deleteDoc, query, orderBy, getDoc, writeBatch } from "firebase/firestore";
 import { ref, uploadString, getDownloadURL } from "firebase/storage";
+import { useToast } from "@/contexts/ToastContext";
 
 // --- Types ---
 export interface GalleryItem {
@@ -79,6 +80,7 @@ const defaultFramePositions: FramePosition[] = [
 export function GalleryProvider({ children }: { children: ReactNode }) {
     const { data: session } = useSession();
     const isAdmin = (session?.user as any)?.role === "admin";
+    const { showToast } = useToast();
 
     const [items, setItems] = useState<GalleryItem[]>(defaultItems);
     const [subtitleOptions, setSubtitleOptions] = useState<string[]>(["Original Piece", "Limited Edition", "Print", "Digital Download"]);
@@ -137,28 +139,17 @@ export function GalleryProvider({ children }: { children: ReactNode }) {
         };
     }, []);
 
-    // --- Firebase Upload Helper ---
-    const uploadImageIfNeeded = async (item: GalleryItem): Promise<GalleryItem> => {
-        if (item.content && item.content.startsWith("data:image")) {
-            const fileName = `gallery/${Date.now()}-${Math.random().toString(36).substring(7)}`;
-            const storageRef = ref(storage, fileName);
-            await uploadString(storageRef, item.content, 'data_url');
-            const downloadURL = await getDownloadURL(storageRef);
-            return { ...item, content: downloadURL, type: "image" };
-        }
-        return item;
-    };
-
     // --- Actions ---
     const addItem = async (item: GalleryItem) => {
         try {
-            const processedItem = await uploadImageIfNeeded(item);
             await addDoc(collection(db, "galleryItems"), {
-                ...processedItem,
+                ...item,
                 createdAt: Date.now()
             });
-        } catch (error) {
+            showToast("Item added successfully!");
+        } catch (error: any) {
             console.error("Error adding item: ", error);
+            showToast(`Upload failed: ${error.message || "Unknown error"}`);
         }
     };
 
@@ -166,11 +157,12 @@ export function GalleryProvider({ children }: { children: ReactNode }) {
         const itemId = items[index]?.id;
         if (!itemId) return;
         try {
-            const processedItem = await uploadImageIfNeeded(updatedItem);
-            const { id, ...dataToSave } = processedItem; // Don't save id in document body
+            const { id, ...dataToSave } = updatedItem; // Don't save id in document body
             await setDoc(doc(db, "galleryItems", itemId), dataToSave, { merge: true });
-        } catch (error) {
+            showToast("Item updated successfully!");
+        } catch (error: any) {
             console.error("Error updating item: ", error);
+            showToast(`Update failed: ${error.message || "Unknown error"}`);
         }
     };
 
