@@ -10,16 +10,16 @@ import LoginModal from "./LoginModal";
 export function Providers({ children }: { children: React.ReactNode }) {
     return (
         <SessionProvider>
-            <ToastProvider>
-                <GalleryProvider>
-                    <CartProvider>
+            <GalleryProvider>
+                <CartProvider>
+                    <ToastProvider>
                         <LoginModalProvider>
                             {children}
                             <LoginModal />
                         </LoginModalProvider>
-                    </CartProvider>
-                </GalleryProvider>
-            </ToastProvider>
+                    </ToastProvider>
+                </CartProvider>
+            </GalleryProvider>
         </SessionProvider>
     );
 }

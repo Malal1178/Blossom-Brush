@@ -91,52 +91,12 @@ export default function GalleryPopup({ isOpen, onClose, item, onUpdate, isAdmin,
         }
     };
 
-    const compressImage = (base64Str: string, maxWidth = 1920, maxHeight = 1920): Promise<string> => {
-        return new Promise((resolve) => {
-            const img = new Image();
-            img.src = base64Str;
-            img.onload = () => {
-                const canvas = document.createElement("canvas");
-                let width = img.width;
-                let height = img.height;
-
-                if (width > height) {
-                    if (width > maxWidth) {
-                        height = Math.round((height *= maxWidth / width));
-                        width = maxWidth;
-                    }
-                } else {
-                    if (height > maxHeight) {
-                        width = Math.round((width *= maxHeight / height));
-                        height = maxHeight;
-                    }
-                }
-
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext("2d");
-                ctx?.drawImage(img, 0, 0, width, height);
-                // Compress to JPEG with 0.85 quality for a good balance of quality and size under 1MB
-                resolve(canvas.toDataURL("image/jpeg", 0.85));
-            };
-        });
-    };
-
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
-            // Give user immediate feedback that something is happening
-            showToast("Processing image...");
             const reader = new FileReader();
-            reader.onloadend = async () => {
-                try {
-                    const compressedBase64 = await compressImage(reader.result as string);
-                    setEditedContent(compressedBase64);
-                    showToast("Image ready!");
-                } catch (error) {
-                    console.error("Compression failed", error);
-                    showToast("Failed to process image.");
-                }
+            reader.onloadend = () => {
+                setEditedContent(reader.result as string);
             };
             reader.readAsDataURL(file);
         }
