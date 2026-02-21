@@ -91,7 +91,7 @@ export default function GalleryPopup({ isOpen, onClose, item, onUpdate, isAdmin,
         }
     };
 
-    const compressImage = (base64Str: string, maxWidth = 800, maxHeight = 800): Promise<string> => {
+    const compressImage = (base64Str: string, maxWidth = 1920, maxHeight = 1920): Promise<string> => {
         return new Promise((resolve) => {
             const img = new Image();
             img.src = base64Str;
@@ -116,8 +116,8 @@ export default function GalleryPopup({ isOpen, onClose, item, onUpdate, isAdmin,
                 canvas.height = height;
                 const ctx = canvas.getContext("2d");
                 ctx?.drawImage(img, 0, 0, width, height);
-                // Compress to JPEG with 0.7 quality to guarantee it's under 1MB
-                resolve(canvas.toDataURL("image/jpeg", 0.7));
+                // Compress to JPEG with 0.85 quality for a good balance of quality and size under 1MB
+                resolve(canvas.toDataURL("image/jpeg", 0.85));
             };
         });
     };
