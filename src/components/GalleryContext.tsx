@@ -3,7 +3,6 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { useSession } from "next-auth/react";
 import { db, storage } from "../lib/firebase";
 import { collection, doc, onSnapshot, setDoc, addDoc, deleteDoc, query, orderBy, getDoc, writeBatch } from "firebase/firestore";
-import { ref, uploadString, getDownloadURL } from "firebase/storage";
 import { useToast } from "@/contexts/ToastContext";
 
 // --- Types ---
