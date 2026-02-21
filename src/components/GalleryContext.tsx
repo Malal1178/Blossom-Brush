@@ -1,6 +1,9 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useSession } from "next-auth/react";
+import { db, storage } from "../lib/firebase";
+import { collection, doc, onSnapshot, setDoc, addDoc, deleteDoc, query, orderBy, getDoc, writeBatch } from "firebase/firestore";
+import { ref, uploadString, getDownloadURL } from "firebase/storage";
 
 // --- Types ---
 export interface GalleryItem {
@@ -12,8 +15,9 @@ export interface GalleryItem {
     price?: number;
     description?: string;
     subtitle?: string;
-    id?: string; // Adding ID for easier linking
-    showOnHome?: boolean; // New flag for curated list
+    id?: string;
+    showOnHome?: boolean;
+    createdAt?: number;
 }
 
 export interface FramePosition {
@@ -25,7 +29,7 @@ export interface FramePosition {
 
 interface GalleryContextType {
     items: GalleryItem[];
-    setItems: (items: GalleryItem[]) => void; // Exposed for complex operations if needed
+    setItems: (items: GalleryItem[]) => void;
     addItem: (item: GalleryItem) => void;
     updateItem: (index: number, item: GalleryItem) => void;
     deleteItem: (index: number) => void;
@@ -33,7 +37,7 @@ interface GalleryContextType {
     subtitleOptions: string[];
     updateSubtitleOptions: (options: string[]) => void;
 
-    heroLinks: (number | null)[]; // Maps Frame Index (0-5) -> Gallery Item Index
+    heroLinks: (number | null)[];
     updateHeroLink: (frameIndex: number, galleryItemIndex: number | null) => void;
 
     framePositions: FramePosition[];
@@ -46,7 +50,7 @@ interface GalleryContextType {
     updateHeroTreeImage: (imagePath: string) => void;
 
     selectedItemIndex: number | null;
-    setSelectedItemIndex: (index: number | null) => void; // Opens/Closes Popup
+    setSelectedItemIndex: (index: number | null) => void;
 
     isAdmin: boolean;
 }
@@ -64,12 +68,12 @@ const defaultItems: GalleryItem[] = [
 ];
 
 const defaultFramePositions: FramePosition[] = [
-    { x: '35.66%', y: '29.34%', width: '6%', height: '10%' }, // Frame 1
-    { x: '43.70%', y: '23.19%', width: '6%', height: '10%' }, // Frame 2
-    { x: '53.81%', y: '23.01%', width: '6%', height: '10%' }, // Frame 3
-    { x: '61.72%', y: '28.88%', width: '6%', height: '10%' }, // Frame 4
-    { x: '42.95%', y: '37.13%', width: '6%', height: '10%' }, // Frame 5
-    { x: '54.91%', y: '36.58%', width: '6%', height: '10%' }, // Frame 6
+    { x: '35.66%', y: '29.34%', width: '6%', height: '10%' },
+    { x: '43.70%', y: '23.19%', width: '6%', height: '10%' },
+    { x: '53.81%', y: '23.01%', width: '6%', height: '10%' },
+    { x: '61.72%', y: '28.88%', width: '6%', height: '10%' },
+    { x: '42.95%', y: '37.13%', width: '6%', height: '10%' },
+    { x: '54.91%', y: '36.58%', width: '6%', height: '10%' },
 ];
 
 export function GalleryProvider({ children }: { children: ReactNode }) {
@@ -78,99 +82,160 @@ export function GalleryProvider({ children }: { children: ReactNode }) {
 
     const [items, setItems] = useState<GalleryItem[]>(defaultItems);
     const [subtitleOptions, setSubtitleOptions] = useState<string[]>(["Original Piece", "Limited Edition", "Print", "Digital Download"]);
-    // Initialize heroLinks to point to the first 6 items by default
     const [heroLinks, setHeroLinks] = useState<(number | null)[]>([0, 1, 2, 3, 4, 5]);
     const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(null);
     const [framePositions, setFramePositions] = useState<FramePosition[]>(defaultFramePositions);
     const [heroTreeImage, setHeroTreeImage] = useState<string>("/assets/hero-tree-final.png");
 
-    // --- Persistence ---
+    // --- Firebase Sync ---
     useEffect(() => {
-        const savedItems = localStorage.getItem("gallery-items");
-        const savedOptions = localStorage.getItem("gallery-options");
-        const savedLinks = localStorage.getItem("hero-links");
-        const savedFramePositions = localStorage.getItem("frame-positions");
-        const savedTreeImage = localStorage.getItem("hero-tree-image");
+        // 1. Gallery Items Listener
+        const q = query(collection(db, "galleryItems"), orderBy("createdAt", "asc"));
+        const unsubItems = onSnapshot(q, (snapshot) => {
+            if (snapshot.empty) {
+                // Initialize default items if empty
+                const initializeDefaults = async () => {
+                    const batch = writeBatch(db);
+                    defaultItems.forEach((item, i) => {
+                        const newDocRef = doc(collection(db, "galleryItems"));
+                        batch.set(newDocRef, { ...item, createdAt: Date.now() + i }); // Ensure order
+                    });
+                    await batch.commit();
+                };
+                initializeDefaults();
+            } else {
+                const fetchedItems = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                } as GalleryItem));
+                setItems(fetchedItems);
+            }
+        });
 
-        if (savedItems) try { setItems(JSON.parse(savedItems)); } catch (e) { console.error(e); }
-        if (savedOptions) try { setSubtitleOptions(JSON.parse(savedOptions)); } catch (e) { console.error(e); }
-        if (savedLinks) try { setHeroLinks(JSON.parse(savedLinks)); } catch (e) { console.error(e); }
-        if (savedFramePositions) try { setFramePositions(JSON.parse(savedFramePositions)); } catch (e) { console.error(e); }
-        if (savedTreeImage) try { setHeroTreeImage(savedTreeImage); } catch (e) { console.error(e); }
+        // 2. Config Listener
+        const unsubConfig = onSnapshot(doc(db, "config", "main"), (docSnap) => {
+            if (!docSnap.exists()) {
+                // Initialize default config if empty
+                setDoc(doc(db, "config", "main"), {
+                    subtitleOptions: ["Original Piece", "Limited Edition", "Print", "Digital Download"],
+                    heroLinks: [0, 1, 2, 3, 4, 5],
+                    framePositions: defaultFramePositions,
+                    heroTreeImage: "/assets/hero-tree-final.png"
+                });
+            } else {
+                const data = docSnap.data();
+                if (data.subtitleOptions) setSubtitleOptions(data.subtitleOptions);
+                if (data.heroLinks) setHeroLinks(data.heroLinks);
+                if (data.framePositions) setFramePositions(data.framePositions);
+                if (data.heroTreeImage) setHeroTreeImage(data.heroTreeImage);
+            }
+        });
+
+        return () => {
+            unsubItems();
+            unsubConfig();
+        };
     }, []);
 
-    useEffect(() => { localStorage.setItem("gallery-items", JSON.stringify(items)); }, [items]);
-    useEffect(() => { localStorage.setItem("gallery-options", JSON.stringify(subtitleOptions)); }, [subtitleOptions]);
-    useEffect(() => { localStorage.setItem("hero-links", JSON.stringify(heroLinks)); }, [heroLinks]);
-    useEffect(() => { localStorage.setItem("frame-positions", JSON.stringify(framePositions)); }, [framePositions]);
-    useEffect(() => { localStorage.setItem("hero-tree-image", heroTreeImage); }, [heroTreeImage]);
+    // --- Firebase Upload Helper ---
+    const uploadImageIfNeeded = async (item: GalleryItem): Promise<GalleryItem> => {
+        if (item.content && item.content.startsWith("data:image")) {
+            const fileName = `gallery/${Date.now()}-${Math.random().toString(36).substring(7)}`;
+            const storageRef = ref(storage, fileName);
+            await uploadString(storageRef, item.content, 'data_url');
+            const downloadURL = await getDownloadURL(storageRef);
+            return { ...item, content: downloadURL, type: "image" };
+        }
+        return item;
+    };
 
     // --- Actions ---
-    const addItem = (item: GalleryItem) => setItems([...items, item]);
-
-    const updateItem = (index: number, updatedItem: GalleryItem) => {
-        const newItems = [...items];
-        newItems[index] = updatedItem;
-        setItems(newItems);
+    const addItem = async (item: GalleryItem) => {
+        try {
+            const processedItem = await uploadImageIfNeeded(item);
+            await addDoc(collection(db, "galleryItems"), {
+                ...processedItem,
+                createdAt: Date.now()
+            });
+        } catch (error) {
+            console.error("Error adding item: ", error);
+        }
     };
 
-    const deleteItem = (index: number) => {
-        const newItems = [...items];
-        newItems.splice(index, 1);
-        setItems(newItems);
-        // Also remove any links to this index (simplistic approach, IDs would be better but keeping simple for now)
-        // If we delete index 2, index 3 becomes 2. Links pointing to 3 need to point to 2. 
-        // Realistically, for this demo, we might just clear links if they are invalid.
-        // Let's just validate links on render.
-        setSelectedItemIndex(null);
+    const updateItem = async (index: number, updatedItem: GalleryItem) => {
+        const itemId = items[index]?.id;
+        if (!itemId) return;
+        try {
+            const processedItem = await uploadImageIfNeeded(updatedItem);
+            const { id, ...dataToSave } = processedItem; // Don't save id in document body
+            await setDoc(doc(db, "galleryItems", itemId), dataToSave, { merge: true });
+        } catch (error) {
+            console.error("Error updating item: ", error);
+        }
     };
 
-    const updateSubtitleOptions = (options: string[]) => setSubtitleOptions(options);
+    const deleteItem = async (index: number) => {
+        const itemId = items[index]?.id;
+        if (!itemId) return;
+        try {
+            await deleteDoc(doc(db, "galleryItems", itemId));
+            setSelectedItemIndex(null);
+        } catch (error) {
+            console.error("Error deleting item: ", error);
+        }
+    };
+
+    const updateConfig = async (key: string, value: any) => {
+        try {
+            await setDoc(doc(db, "config", "main"), { [key]: value }, { merge: true });
+        } catch (error) {
+            console.error(`Error updating config ${key}: `, error);
+        }
+    };
+
+    const updateSubtitleOptions = (options: string[]) => updateConfig("subtitleOptions", options);
 
     const updateHeroLink = (frameIndex: number, galleryItemIndex: number | null) => {
         const newLinks = [...heroLinks];
         newLinks[frameIndex] = galleryItemIndex;
-        setHeroLinks(newLinks);
+        updateConfig("heroLinks", newLinks);
     };
 
     const updateFramePosition = (index: number, position: FramePosition) => {
         const newPositions = [...framePositions];
         newPositions[index] = position;
-        setFramePositions(newPositions);
+        updateConfig("framePositions", newPositions);
     };
 
     const resetFramePositions = () => {
-        setFramePositions(defaultFramePositions);
+        updateConfig("framePositions", defaultFramePositions);
     };
 
     const addFrame = () => {
-        // Add new frame with default position at center
-        const newFrame: FramePosition = {
-            x: '45%',
-            y: '45%',
-            width: '10%',
-            height: '14%'
-        };
-        setFramePositions([...framePositions, newFrame]);
-        // Add corresponding null link
-        setHeroLinks([...heroLinks, null]);
+        const newFrame: FramePosition = { x: '45%', y: '45%', width: '10%', height: '14%' };
+        const newPositions = [...framePositions, newFrame];
+        const newLinks = [...heroLinks, null];
+
+        // Batch update to keep config consistent
+        setDoc(doc(db, "config", "main"), {
+            framePositions: newPositions,
+            heroLinks: newLinks
+        }, { merge: true });
     };
 
     const removeFrame = (index: number) => {
-        // Prevent removing if only 1 frame left
         if (framePositions.length <= 1) return;
-
-        // Remove frame position
         const newPositions = framePositions.filter((_, i) => i !== index);
-        setFramePositions(newPositions);
-
-        // Remove corresponding link
         const newLinks = heroLinks.filter((_, i) => i !== index);
-        setHeroLinks(newLinks);
+
+        setDoc(doc(db, "config", "main"), {
+            framePositions: newPositions,
+            heroLinks: newLinks
+        }, { merge: true });
     };
 
     const updateHeroTreeImage = (imagePath: string) => {
-        setHeroTreeImage(imagePath);
+        updateConfig("heroTreeImage", imagePath);
     };
 
     return (

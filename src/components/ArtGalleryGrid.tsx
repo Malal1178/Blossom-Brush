@@ -47,10 +47,10 @@ export default function ArtGalleryGrid() {
     };
 
     return (
-        <section className="py-20 px-4 md:px-8 bg-[#FDFBF7]">
+        <section className="py-12 md:py-20 px-4 md:px-8 bg-[#FDFBF7]">
             <div className="container mx-auto">
-                <div className="flex justify-between items-center mb-12">
-                    <h2 className="text-4xl font-bold text-[#5D4037]">
+                <div className="flex flex-col md:flex-row justify-between items-center mb-8 md:mb-12 gap-4">
+                    <h2 className="text-3xl md:text-4xl font-bold text-[#5D4037] text-center md:text-left">
                         Full Gallery Archive
                     </h2>
                     {isAdmin && (

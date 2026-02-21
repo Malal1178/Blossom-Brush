@@ -44,8 +44,8 @@ export default function CheckoutPage() {
                     Back to Gallery
                 </Link>
 
-                <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 border border-[#E8DCC4]">
-                    <h1 className="text-4xl font-bold mb-2 text-[#5D4037]">Checkout & Inquiry</h1>
+                <div className="bg-white rounded-3xl shadow-xl p-6 md:p-12 border border-[#E8DCC4]">
+                    <h1 className="text-3xl md:text-4xl font-bold mb-2 text-[#5D4037]">Checkout & Inquiry</h1>
                     <p className="text-[#8D6E63] mb-8 text-lg">
                         Complete the form below to finalize your order or ask about a specific piece.
                     </p>

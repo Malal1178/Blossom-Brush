@@ -33,6 +33,13 @@ export default function Header() {
 
                     {/* Nav Links */}
                     <nav className="flex gap-4 items-center">
+                        {/* Logo / Brand Icon */}
+                        <Link href="/" className="flex items-center group mr-2">
+                            <div className="w-8 h-8 rounded-full bg-[#E8DCC4] border-2 border-[#5D4037] flex items-center justify-center overflow-hidden transition-transform group-hover:scale-110">
+                                <Flower className="w-5 h-5 text-[#5D4037]" />
+                            </div>
+                        </Link>
+
                         {navItems.map((item) => (
                             <Link
                                 key={item.label}
@@ -60,15 +67,15 @@ export default function Header() {
                             }
                         }}
                     >
-                        <input className="searchInput" type="text" name="q" placeholder="Search" required />
+                        <input className="searchInput" type="text" name="q" placeholder="Search" />
                         <button className="searchButton" type="submit">
                             <Search className="w-5 h-5" />
                         </button>
                     </form>
                 </div>
 
-                {/* Right Actions */}
-                <div className="hidden md:flex items-center gap-3">
+                {/* Right Actions & Logo */}
+                <div className="flex items-center gap-2 sm:gap-3 ml-auto md:ml-0">
                     <button
                         onClick={toggleCart}
                         className="relative p-2 rounded-full hover:bg-[#FDFBF7] transition-colors text-[#5D4037]"
@@ -81,21 +88,15 @@ export default function Header() {
                         )}
                     </button>
                     <UserButton />
-                    {/* Logo - Right (Desktop) */}
-                    <Link href="/" className="flex items-center gap-3 group ml-4">
+
+                    {/* Logo - Right (Mobile) */}
+                    <Link href="/" className="md:hidden flex items-center group ml-1">
                         <div className="w-10 h-10 rounded-full bg-[#E8DCC4] border-2 border-[#5D4037] flex items-center justify-center overflow-hidden transition-transform group-hover:scale-110">
                             <Flower className="w-6 h-6 text-[#5D4037]" />
                         </div>
                     </Link>
                 </div>
-
-                {/* Logo - Right (Mobile) */}
-                <Link href="/" className="md:hidden flex items-center gap-3 group ml-auto">
-                    <div className="w-10 h-10 rounded-full bg-[#E8DCC4] border-2 border-[#5D4037] flex items-center justify-center overflow-hidden transition-transform group-hover:scale-110">
-                        <Flower className="w-6 h-6 text-[#5D4037]" />
-                    </div>
-                </Link>
             </div>
-        </motion.header>
+        </motion.header >
     );
 }

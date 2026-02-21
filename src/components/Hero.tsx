@@ -27,7 +27,8 @@ export default function Hero() {
         <div className="min-h-screen bg-[#FDFBF7] font-sans text-[#5D4037]">
             {/* --- Hero Section --- */}
             {/* --- Hero Section --- */}
-            <section className="relative flex flex-col items-center justify-center pt-10 pb-20 overflow-hidden min-h-[calc(100vh-80px)]">
+            {/* --- Hero Section --- */}
+            <section className="relative flex flex-col items-center justify-center pt-24 pb-12 overflow-hidden min-h-[calc(100vh-60px)] md:min-h-[calc(100vh-80px)]">
                 <SakuraBackground />
 
                 {/* Admin Edit Mode Button */}
@@ -48,10 +49,10 @@ export default function Hero() {
                 <FrameSettingsPanel isOpen={isEditMode} onClose={() => setIsEditMode(false)} />
 
                 {/* The "Art Tree" Background */}
-                <div className="relative h-[85vh] w-auto max-w-full aspect-[4/3] flex items-center justify-center -mb-20 mx-auto">
+                <div className="relative h-[60vh] md:h-[85vh] w-full aspect-square md:aspect-[4/3] flex items-center justify-center -mb-10 md:-mb-20 mx-auto">
                     <div className="relative w-full h-full">
                         <InteractiveTree
-                            className="w-full h-full"
+                            className="w-full h-full object-contain"
                             onFrameClick={handleTreeFrameClick}
                             editMode={isEditMode}
                         />
@@ -63,12 +64,12 @@ export default function Hero() {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5, duration: 0.8 }}
-                    className="text-center z-10 relative px-4"
+                    className="text-center z-10 relative px-4 mt-4 md:mt-0"
                 >
-                    <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-2 text-[#5D4037]">
+                    <h1 className="text-4xl md:text-7xl font-bold tracking-tight mb-2 text-[#5D4037]">
                         — Blossom & Brush —
                     </h1>
-                    <p className="text-2xl md:text-3xl font-medium text-[#8D6E63] mb-8">
+                    <p className="text-xl md:text-3xl font-medium text-[#8D6E63] mb-8">
                         Your Garden of Art
                     </p>
 
