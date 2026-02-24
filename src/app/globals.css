@@ -12,7 +12,7 @@
 }
 
 :root {
-  color-scheme: only light !important;
+  color-scheme: light dark !important;
   --background: var(--color-cream);
   --foreground: var(--color-earth);
 }
@@ -25,10 +25,10 @@ body {
   font-family: var(--font-quicksand), sans-serif;
 }
 
-/* Force Light Mode regardless of OS preference */
+/* Fake Dark Mode trick: If OS prefers dark, we tell the browser we support it, but we force light colors anyway */
 @media (prefers-color-scheme: dark) {
   :root {
-    color-scheme: only light !important;
+    color-scheme: dark !important;
     --background: var(--color-cream);
     --foreground: var(--color-earth);
   }
