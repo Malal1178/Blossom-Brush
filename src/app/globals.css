@@ -12,7 +12,8 @@
 }
 
 :root {
-  color-scheme: only light;
+  color-scheme: light only !important;
+  supported-color-schemes: light !important;
   --background: var(--color-cream);
   --foreground: var(--color-earth);
 }

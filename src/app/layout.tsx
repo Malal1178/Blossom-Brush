@@ -14,6 +14,11 @@ const quicksand = Quicksand({
 export const metadata: Metadata = {
   title: "Blossom & Brush",
   description: "Your Garden of Art",
+  other: {
+    "darkreader-lock": "true",
+    "darkreader": "nope",
+    "color-scheme": "light only",
+  },
 };
 
 export const viewport: Viewport = {
