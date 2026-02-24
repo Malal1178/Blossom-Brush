@@ -26,6 +26,15 @@ body {
   font-family: var(--font-quicksand), sans-serif;
 }
 
+/* Force Light Mode regardless of OS preference */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: light;
+    --background: var(--color-cream);
+    --foreground: var(--color-earth);
+  }
+}
+
 @keyframes sway {
 
   0%,

@@ -23,7 +23,10 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#FDFBF7",
-  colorScheme: "only light",
+  colorScheme: "light",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default function RootLayout({
@@ -32,8 +35,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${quicksand.variable} antialiased`}>
+    <html lang="en" className="light" style={{ colorScheme: 'light' }}>
+      <head>
+        <meta name="color-scheme" content="light only" />
+        <meta name="theme-color" content="#FDFBF7" />
+      </head>
+      <body className={`${quicksand.variable} antialiased min-h-screen bg-[#FDFBF7] text-[#5D4037]`}>
         <Providers>
           <Header />
           <CartSidebar />
