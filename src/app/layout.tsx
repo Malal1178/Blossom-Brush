@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Quicksand } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
@@ -14,6 +14,11 @@ const quicksand = Quicksand({
 export const metadata: Metadata = {
   title: "Blossom & Brush",
   description: "Your Garden of Art",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#FDFBF7",
+  colorScheme: "only light",
 };
 
 export default function RootLayout({

@@ -12,6 +12,7 @@
 }
 
 :root {
+  color-scheme: only light;
   --background: var(--color-cream);
   --foreground: var(--color-earth);
 }
@@ -50,8 +51,8 @@ body {
   transition: 0.4s;
 }
 
-.searchBox:hover > .searchInput,
-.searchBox:focus-within > .searchInput {
+.searchBox:hover>.searchInput,
+.searchBox:focus-within>.searchInput {
   width: 200px;
   padding: 0 10px;
 }
