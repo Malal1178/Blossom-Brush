@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, ShoppingCart, Upload, Save } from "lucide-react";
 import { useCart } from "./CartContext";
 import { useToast } from "@/contexts/ToastContext";
+import { uploadImageToSupabase } from "@/lib/uploadImage";
 
 interface GalleryItem {
     type: "emoji" | "image";
@@ -38,6 +39,7 @@ export default function GalleryPopup({ isOpen, onClose, item, onUpdate, isAdmin,
     const [editedContent, setEditedContent] = useState(item.content);
     const [editedDescription, setEditedDescription] = useState(item.description || "This unique piece allows you to explore new creative mediums. Perfect for your collection or as a gift for an art lover.");
     const [editedSubtitle, setEditedSubtitle] = useState(item.subtitle || "Original Piece");
+    const [isSaving, setIsSaving] = useState(false);
 
     // Reset state when item changes
     useEffect(() => {
@@ -69,17 +71,37 @@ export default function GalleryPopup({ isOpen, onClose, item, onUpdate, isAdmin,
         onClose();
     };
 
-    const handleSave = () => {
-        onUpdate({
-            ...item,
-            name: editedName,
-            price: editedPrice,
-            content: editedContent,
-            description: editedDescription,
-            subtitle: editedSubtitle,
-            type: editedContent.startsWith("data:image") ? "image" : item.type
-        });
-        setIsEditing(false);
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            let finalContent = editedContent;
+
+            // If it's a new base64 image (starts with data:image), upload to Supabase
+            if (editedContent.startsWith("data:image")) {
+                const publicUrl = await uploadImageToSupabase(editedContent, `artwork_${editedName.replace(/\s+/g, '_')}.png`);
+                if (publicUrl) {
+                    finalContent = publicUrl;
+                } else {
+                    showToast("Failed to upload image. Saving locally.");
+                }
+            }
+
+            onUpdate({
+                ...item,
+                name: editedName,
+                price: editedPrice,
+                content: finalContent,
+                description: editedDescription,
+                subtitle: editedSubtitle,
+                type: finalContent.startsWith("data:image") || finalContent.startsWith("http") ? "image" : item.type
+            });
+            setIsEditing(false);
+        } catch (e) {
+            console.error(e);
+            showToast("Error saving artwork.");
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     const handleDelete = () => {
@@ -139,14 +161,14 @@ export default function GalleryPopup({ isOpen, onClose, item, onUpdate, isAdmin,
                                 </button>
                             )}
 
-                            {editedContent.startsWith("data:image") || item.type === "image" ? (
+                            {editedContent.startsWith("data:image") || editedContent.startsWith("http") || item.type === "image" ? (
                                 <img
                                     src={editedContent}
                                     alt="Artwork"
                                     className="max-full max-h-full object-contain shadow-lg rounded-lg" // Changed from w-full h-full object-cover
                                 />
                             ) : (
-                                <div className="text-[120px] filter drop-shadow-xl">{editedContent}</div>
+                                <div className="text-[120px] filter drop-shadow-xl select-none" style={{ color: `hsl(${item.hueA}, ${item.hueB}%, 40%)` }}>{editedContent}</div>
                             )}
 
                             <input
@@ -287,10 +309,11 @@ export default function GalleryPopup({ isOpen, onClose, item, onUpdate, isAdmin,
                                         </button>
                                         <button
                                             onClick={handleSave}
-                                            className="flex-1 py-4 bg-[#4CAF50] text-white rounded-full font-bold text-lg hover:brightness-110 transition-all shadow-lg flex items-center justify-center gap-2"
+                                            disabled={isSaving}
+                                            className={`flex-1 py-4 text-white rounded-full font-bold text-lg hover:brightness-110 transition-all shadow-lg flex items-center justify-center gap-2 ${isSaving ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#4CAF50]'}`}
                                         >
                                             <Save size={20} />
-                                            Save Changes
+                                            {isSaving ? "Saving..." : "Save Changes"}
                                         </button>
                                     </div>
                                 ) : (

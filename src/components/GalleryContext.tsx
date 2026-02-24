@@ -1,6 +1,7 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useSession } from "next-auth/react";
+import { supabase } from "@/lib/supabaseClient";
 
 // --- Types ---
 export interface GalleryItem {
@@ -82,17 +83,77 @@ export function GalleryProvider({ children }: { children: ReactNode }) {
     const [heroLinks, setHeroLinks] = useState<(number | null)[]>([0, 1, 2, 3, 4, 5]);
     const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(null);
     const [framePositions, setFramePositions] = useState<FramePosition[]>(defaultFramePositions);
-    const [heroTreeImage, setHeroTreeImage] = useState<string>("/assets/hero-tree-final.png");
+    const [heroTreeImage, setHeroTreeImage] = useState<string>("/assets/uploaded-tree.png");
 
     // --- Persistence ---
     useEffect(() => {
-        const savedItems = localStorage.getItem("gallery-items");
+        const fetchItems = async () => {
+            // Fetch items ordered by updated_at descending to show newest/recently edited first
+            const { data, error } = await supabase.from('items').select('*').order('updated_at', { ascending: false });
+            if (error) {
+                console.error('Error fetching items from Supabase:', error);
+                // Fallback to local storage or defaults if Supabase fails
+                const savedItems = localStorage.getItem("gallery-items");
+                if (savedItems) {
+                    try { setItems(JSON.parse(savedItems)); } catch (e) { console.error(e); }
+                }
+            } else if (data && data.length > 0) {
+                // Map DB snake_case to CamelCase if necessary, though our types mostly match
+                const mappedItems = data.map((row: any) => ({
+                    ...row,
+                    hueA: row.huea,
+                    hueB: row.hueb,
+                    showOnHome: row.show_on_home
+                }));
+                // Only override if data exists to avoid wiping defaults on empty DB
+                setItems(mappedItems);
+            } else {
+                // Database is empty. Let's migrate any local storage items or defaults to Supabase.
+                let itemsToMigrate = defaultItems;
+                const savedItems = localStorage.getItem("gallery-items");
+                if (savedItems) {
+                    try {
+                        const parsed = JSON.parse(savedItems);
+                        if (parsed && parsed.length > 0) itemsToMigrate = parsed;
+                    } catch (e) { console.error(e); }
+                }
+
+                const payloads = itemsToMigrate.map(item => ({
+                    type: item.type,
+                    content: item.content,
+                    huea: item.hueA,
+                    hueb: item.hueB,
+                    name: item.name,
+                    price: item.price,
+                    description: item.description,
+                    subtitle: item.subtitle,
+                    show_on_home: item.showOnHome || false,
+                    updated_at: new Date().toISOString()
+                }));
+
+                const { data: insertedData, error: insertError } = await supabase.from('items').insert(payloads).select();
+                if (!insertError && insertedData) {
+                    const migrated = insertedData.map((row: any) => ({
+                        id: row.id,
+                        ...row,
+                        hueA: row.huea,
+                        hueB: row.hueb,
+                        showOnHome: row.show_on_home
+                    }));
+                    setItems(migrated);
+                } else {
+                    setItems(itemsToMigrate);
+                }
+            }
+        };
+
+        fetchItems();
+
         const savedOptions = localStorage.getItem("gallery-options");
         const savedLinks = localStorage.getItem("hero-links");
         const savedFramePositions = localStorage.getItem("frame-positions");
         const savedTreeImage = localStorage.getItem("hero-tree-image");
 
-        if (savedItems) try { setItems(JSON.parse(savedItems)); } catch (e) { console.error(e); }
         if (savedOptions) try { setSubtitleOptions(JSON.parse(savedOptions)); } catch (e) { console.error(e); }
         if (savedLinks) try { setHeroLinks(JSON.parse(savedLinks)); } catch (e) { console.error(e); }
         if (savedFramePositions) try { setFramePositions(JSON.parse(savedFramePositions)); } catch (e) { console.error(e); }
@@ -106,22 +167,77 @@ export function GalleryProvider({ children }: { children: ReactNode }) {
     useEffect(() => { localStorage.setItem("hero-tree-image", heroTreeImage); }, [heroTreeImage]);
 
     // --- Actions ---
-    const addItem = (item: GalleryItem) => setItems([...items, item]);
+    const addItem = async (item: GalleryItem) => {
+        const payload = {
+            type: item.type,
+            content: item.content,
+            huea: item.hueA,
+            hueb: item.hueB,
+            name: item.name,
+            price: item.price,
+            description: item.description,
+            subtitle: item.subtitle,
+            show_on_home: item.showOnHome,
+            updated_at: new Date().toISOString()
+        };
 
-    const updateItem = (index: number, updatedItem: GalleryItem) => {
+        const { data, error } = await supabase.from('items').insert([payload]).select();
+        if (error) {
+            console.error("Error inserting item:", error);
+            // Fallback for local testing if DB is down
+            setItems([...items, item]);
+        } else if (data && data[0]) {
+            const newItem = { ...item, id: data[0].id };
+            setItems([...items, newItem]);
+        }
+    };
+
+    const updateItem = async (index: number, updatedItem: GalleryItem) => {
         const newItems = [...items];
         newItems[index] = updatedItem;
         setItems(newItems);
+
+        // If it has an ID, update it in Supabase
+        const payload = {
+            type: updatedItem.type,
+            content: updatedItem.content,
+            huea: updatedItem.hueA,
+            hueb: updatedItem.hueB,
+            name: updatedItem.name,
+            price: updatedItem.price,
+            description: updatedItem.description,
+            subtitle: updatedItem.subtitle,
+            show_on_home: updatedItem.showOnHome,
+            updated_at: new Date().toISOString()
+        };
+
+        if (updatedItem.id) {
+            const { error } = await supabase.from('items').update(payload).eq('id', updatedItem.id);
+            if (error) console.error("Error updating item:", error);
+        } else {
+            // It has no ID, so it was a default/local item being edited. Insert it!
+            const { data, error } = await supabase.from('items').insert([payload]).select();
+            if (error) {
+                console.error("Error inserting missing item:", error);
+            } else if (data && data[0]) {
+                const finalItems = [...newItems];
+                finalItems[index] = { ...updatedItem, id: data[0].id };
+                setItems(finalItems);
+            }
+        }
     };
 
-    const deleteItem = (index: number) => {
+    const deleteItem = async (index: number) => {
+        const itemToDelete = items[index];
         const newItems = [...items];
         newItems.splice(index, 1);
         setItems(newItems);
-        // Also remove any links to this index (simplistic approach, IDs would be better but keeping simple for now)
-        // If we delete index 2, index 3 becomes 2. Links pointing to 3 need to point to 2. 
-        // Realistically, for this demo, we might just clear links if they are invalid.
-        // Let's just validate links on render.
+
+        if (itemToDelete.id) {
+            const { error } = await supabase.from('items').delete().eq('id', itemToDelete.id);
+            if (error) console.error("Error deleting item:", error);
+        }
+
         setSelectedItemIndex(null);
     };
 

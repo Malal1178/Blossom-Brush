@@ -74,7 +74,7 @@ export default function ArtGalleryGrid() {
                             transition={{ duration: 0.3 }}
                             onClick={() => setSelectedItemIndex(index)}
                         >
-                            {item.type === "image" || (item.content && item.content.startsWith('/')) || (item.content && item.content.startsWith('data:')) ? (
+                            {item.type === "image" || (item.content && item.content.startsWith('/')) || (item.content && item.content.startsWith('http')) || (item.content && item.content.startsWith('data:')) ? (
                                 <div className="relative w-full h-full">
                                     <img
                                         src={item.content}
@@ -84,7 +84,7 @@ export default function ArtGalleryGrid() {
                                 </div>
                             ) : (
                                 <div
-                                    className="w-full h-full flex items-center justify-center text-6xl"
+                                    className="w-full h-full flex items-center justify-center text-6xl select-none"
                                     style={{ background: `linear-gradient(135deg, ${hue(item.hueA)}, ${hue(item.hueB)})` }}
                                 >
                                     {item.content}

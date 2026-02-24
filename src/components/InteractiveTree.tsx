@@ -1,6 +1,8 @@
 "use client";
 import React from 'react';
 import { useGallery } from "./GalleryContext";
+import { uploadImageToSupabase } from "@/lib/uploadImage";
+import { useState } from "react";
 
 interface InteractiveTreeProps {
     className?: string;
@@ -19,6 +21,7 @@ export default function InteractiveTree({ className, onFrameClick, editMode = fa
         heroTreeImage,
         updateHeroTreeImage
     } = useGallery();
+    const [isUploading, setIsUploading] = useState(false);
 
     const handleFrameClick = (frameIndex: number) => {
         const linkedItemIndex = heroLinks[frameIndex];
@@ -32,12 +35,12 @@ export default function InteractiveTree({ className, onFrameClick, editMode = fa
         }
     };
 
-    const getFrameImage = (frameIndex: number): string => {
+    const getFrameItem = (frameIndex: number) => {
         const linkedItemIndex = heroLinks[frameIndex];
         if (linkedItemIndex !== null && items[linkedItemIndex]) {
-            return items[linkedItemIndex].content;
+            return items[linkedItemIndex];
         }
-        return "";
+        return null;
     };
 
     const handleDragStart = (e: React.DragEvent, index: number) => {
@@ -69,10 +72,19 @@ export default function InteractiveTree({ className, onFrameClick, editMode = fa
         const file = e.target.files?.[0];
         if (!file) return;
 
+        setIsUploading(true);
         const reader = new FileReader();
-        reader.onloadend = () => {
+        reader.onloadend = async () => {
             const base64String = reader.result as string;
-            updateHeroTreeImage(base64String);
+            const publicUrl = await uploadImageToSupabase(base64String, `hero_tree_${Date.now()}.png`);
+            if (publicUrl) {
+                updateHeroTreeImage(publicUrl);
+            } else {
+                alert("Failed to upload image to the cloud.");
+                // Fallback to local
+                updateHeroTreeImage(base64String);
+            }
+            setIsUploading(false);
         };
         reader.readAsDataURL(file);
     };
@@ -88,8 +100,8 @@ export default function InteractiveTree({ className, onFrameClick, editMode = fa
                 />
                 {/* Image upload button in edit mode */}
                 {editMode && isAdmin && (
-                    <label className="absolute top-2 left-2 px-3 py-1 bg-[#FFB7C5] border-2 border-[#5D4037] text-[#5D4037] rounded-full text-xs font-bold hover:bg-[#5D4037] hover:text-white transition-all cursor-pointer shadow-lg z-20">
-                        Change Image
+                    <label className={`absolute top-2 left-2 px-3 py-1 border-2 border-[#5D4037] text-[#5D4037] rounded-full text-xs font-bold transition-all shadow-lg z-20 ${isUploading ? 'bg-gray-400 cursor-wait' : 'bg-[#FFB7C5] hover:bg-[#5D4037] hover:text-white cursor-pointer'}`}>
+                        {isUploading ? "Uploading..." : "Change Image"}
                         <input
                             type="file"
                             accept="image/*"
@@ -102,7 +114,7 @@ export default function InteractiveTree({ className, onFrameClick, editMode = fa
 
             {/* White picture frame slots */}
             {framePositions.map((position, index) => {
-                const image = getFrameImage(index);
+                const item = getFrameItem(index);
                 const editable = isAdmin || (heroLinks[index] !== null);
 
                 return (
@@ -132,13 +144,19 @@ export default function InteractiveTree({ className, onFrameClick, editMode = fa
                             height: position.height,
                         }}
                     >
-                        {/* Display linked image if present */}
-                        {image ? (
-                            <img
-                                src={image}
-                                alt={`Frame ${index}`}
-                                className="w-full h-full object-cover pointer-events-none"
-                            />
+                        {/* Display linked item if present */}
+                        {item ? (
+                            item.type === "image" ? (
+                                <img
+                                    src={item.content}
+                                    alt={`Frame ${index}`}
+                                    className="w-full h-full object-cover pointer-events-none"
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-4xl filter drop-shadow-md pointer-events-none" style={{ backgroundColor: `hsl(${item.hueA}, ${item.hueB}%, 90%)` }}>
+                                    {item.content}
+                                </div>
+                            )
                         ) : (
                             <div className="w-full h-full flex items-center justify-center bg-white transition-colors hover:bg-stone-50">
                                 {editMode && (
