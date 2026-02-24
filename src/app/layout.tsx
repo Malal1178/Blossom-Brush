@@ -17,13 +17,12 @@ export const metadata: Metadata = {
   other: {
     "darkreader-lock": "true",
     "darkreader": "nope",
-    "color-scheme": "light only",
   },
 };
 
 export const viewport: Viewport = {
   themeColor: "#FDFBF7",
-  colorScheme: "light",
+  colorScheme: "only light",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -35,9 +34,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="light" style={{ colorScheme: 'light' }}>
+    <html lang="en" className="light" style={{ colorScheme: 'only light' }}>
       <head>
-        <meta name="color-scheme" content="light only" />
+        <meta name="color-scheme" content="only light" />
         <meta name="theme-color" content="#FDFBF7" />
       </head>
       <body className={`${quicksand.variable} antialiased min-h-screen bg-[#FDFBF7] text-[#5D4037]`}>

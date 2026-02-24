@@ -12,8 +12,7 @@
 }
 
 :root {
-  color-scheme: light only !important;
-  supported-color-schemes: light !important;
+  color-scheme: only light !important;
   --background: var(--color-cream);
   --foreground: var(--color-earth);
 }
@@ -29,7 +28,7 @@ body {
 /* Force Light Mode regardless of OS preference */
 @media (prefers-color-scheme: dark) {
   :root {
-    color-scheme: light;
+    color-scheme: only light !important;
     --background: var(--color-cream);
     --foreground: var(--color-earth);
   }
