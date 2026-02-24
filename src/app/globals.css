@@ -34,6 +34,20 @@ body {
   }
 }
 
+/* Samsung Internet specific overrides to stop auto-dark mode inversion */
+html {
+  -webkit-filter: invert(0) !important;
+  filter: invert(0) !important;
+}
+
+img,
+video,
+iframe,
+canvas {
+  -webkit-filter: invert(0) !important;
+  filter: invert(0) !important;
+}
+
 @keyframes sway {
 
   0%,

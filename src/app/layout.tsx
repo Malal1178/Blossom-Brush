@@ -37,6 +37,7 @@ export default function RootLayout({
     <html lang="en" className="light" style={{ colorScheme: 'only light' }}>
       <head>
         <meta name="color-scheme" content="only light" />
+        <meta name="Supported-Color-Schemes" content="only light" />
         <meta name="theme-color" content="#FDFBF7" />
       </head>
       <body className={`${quicksand.variable} antialiased min-h-screen bg-[#FDFBF7] text-[#5D4037]`}>
