@@ -1,10 +1,11 @@
 import React from 'react';
+import Footer from '@/components/Footer';
 
 export default function TermsPage() {
     return (
-        <div className="min-h-screen bg-[#FDFBF7] font-sans text-[#5D4037] pt-24 pb-12">
-            <div className="container mx-auto px-6 max-w-4xl">
-                <h1 className="text-4xl font-bold mb-8 text-center text-[#8D6E63]">Terms of Service</h1>
+        <div className="min-h-screen font-sans text-[#5D4037] relative overflow-hidden">
+            <div className="container mx-auto px-6 max-w-4xl relative z-10 pt-24 pb-12">
+                <h1 className="text-4xl font-bold mb-8 text-center text-[#8D6E63] relative" style={{ WebkitTextStroke: "1px #5D4037", textShadow: "2px 2px 0px #FDFBF7" }}>Terms of Service</h1>
 
                 <div className="bg-white/50 p-8 rounded-2xl shadow-sm border border-[#E7E5E4]/50 space-y-6">
                     <section>
@@ -57,6 +58,7 @@ export default function TermsPage() {
                     </section>
                 </div>
             </div>
+            <Footer />
         </div>
     );
 }

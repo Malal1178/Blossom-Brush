@@ -20,7 +20,6 @@ export default function Footer() {
                 <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-6 text-stone-400 text-sm">
                     <Link href="/terms" className="hover:text-earth transition-colors cursor-pointer">Terms</Link>
                     <Link href="/privacy" className="hover:text-earth transition-colors cursor-pointer">Privacy</Link>
-                    <a href="#" className="hover:text-earth transition-colors">Instagram</a>
                 </div>
             </div>
         </footer>
