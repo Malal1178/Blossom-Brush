@@ -133,7 +133,7 @@ function Card({ item, onClick }: CardProps) {
             className={`relative flex justify-center items-center overflow-hidden pt-5 -mb-32 mx-auto`}
             initial="offscreen"
             whileInView="onscreen"
-            viewport={{ once: true, amount: 0.2, margin: "0px" }}
+            viewport={{ amount: 0.5, margin: "-50px" }}
             style={{ perspective: 1000 }}
         >
             <div
