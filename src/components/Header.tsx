@@ -12,9 +12,9 @@ export default function Header() {
 
     const navItems = [
         { label: "Home", href: "/" },
-        { label: "About Us", href: "/about-us" },
-        { label: "Contact Us", href: "/contact-us" },
         { label: "Gallery", href: "/gallery" },
+        { label: "Contact Us", href: "/contact-us" },
+        { label: "About Us", href: "/about-us" },
     ];
 
     return (
@@ -46,7 +46,7 @@ export default function Header() {
                                 href={item.href}
                                 className="flex items-center gap-2 px-4 py-1.5 rounded-full hover:bg-[#FDFBF7] transition-colors text-[#5D4037] font-bold text-sm"
                             >
-                                {item.label !== "Home" && <Flower className="w-4 h-4 text-[#FFB7C5]" />}
+                                <Flower className="w-4 h-4 text-[#FFB7C5]" />
                                 <span>{item.label}</span>
                             </Link>
                         ))}
