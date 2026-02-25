@@ -7,6 +7,37 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { useCart } from "./CartContext";
 
+const LocationButton = () => {
+    const handleLocationClick = async () => {
+        const locationUrl = 'https://www.google.com/maps/search/?api=1&query=35.6895,139.6917';
+        const locationTitle = 'Visit our Gallery';
+
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: locationTitle,
+                    text: 'Open gallery location in your favorite maps app:',
+                    url: locationUrl,
+                });
+            } catch (error) {
+                console.log('Error sharing', error);
+            }
+        } else {
+            // Fallback: If the browser doesn't support the share menu, just open Google Maps
+            window.open(locationUrl, '_blank');
+        }
+    };
+
+    return (
+        <button
+            onClick={handleLocationClick}
+            className="flex items-center gap-2 px-4 py-1.5 bg-[#FFB7C5]/30 text-[#9d174d] rounded-full font-bold hover:bg-[#FFB7C5]/50 transition-all text-sm ml-2"
+        >
+            📍 Location
+        </button>
+    );
+};
+
 export default function Header() {
     const { cart, toggleCart } = useCart();
 
@@ -44,12 +75,13 @@ export default function Header() {
                             <Link
                                 key={item.label}
                                 href={item.href}
-                                className="flex items-center gap-2 px-4 py-1.5 rounded-full hover:bg-[#FDFBF7] transition-colors text-[#5D4037] font-bold text-sm"
+                                className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-[#FDFBF7] transition-colors text-[#5D4037] font-bold text-sm"
                             >
                                 {item.label !== "Home" && <Flower className="w-4 h-4 text-[#FFB7C5]" />}
                                 <span>{item.label}</span>
                             </Link>
                         ))}
+                        <LocationButton />
                     </nav>
 
                     {/* Search */}
