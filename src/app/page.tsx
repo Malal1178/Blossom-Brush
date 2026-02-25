@@ -4,7 +4,7 @@ import ArtScrollGallery from "@/components/ArtScrollGallery";
 
 export default function Home() {
   return (
-    <main className="min-h-screen selection:bg-[#FFB7C5]/30">
+    <main className="min-h-screen selection:bg-pink-300/30">
       <Hero />
       <ArtScrollGallery />
       <Footer />

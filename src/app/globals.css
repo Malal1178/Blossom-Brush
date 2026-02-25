@@ -5,33 +5,45 @@
   --color-blossom: #FFB7C5;
   --color-sage: #98FB98;
   --color-earth: #5D4037;
+  --color-pink-50: #fdf2f8;
+  --color-pink-100: #fce7f3;
+  --color-pink-200: #fbcfe8;
+  --color-pink-300: #f9a8d4;
+  --color-pink-400: #f472b6;
+  --color-pink-500: #ec4899;
+  --color-pink-600: #db2777;
+  --color-pink-700: #be185d;
+  --color-pink-800: #9d174d;
+  --color-pink-900: #831843;
+  --color-rose-100: #ffe4e6;
+  --color-rose-200: #fecdd3;
+  --color-rose-300: #fda4af;
+  --color-rose-400: #fb7185;
 
   --font-quicksand: var(--font-quicksand);
+  --font-fredoka: var(--font-fredoka);
 
   --font-sans: var(--font-quicksand);
+  --font-heading: var(--font-fredoka);
+}
+
+@layer utilities {
+  .font-heading {
+    font-family: var(--font-heading), sans-serif;
+  }
 }
 
 :root {
-  color-scheme: light dark !important;
-  --background: var(--color-cream);
-  --foreground: var(--color-earth);
+  color-scheme: light !important;
+  --background: #fffafa;
+  /* very slight pink/white */
+  --foreground: #9d174d;
+  /* pink-800 */
 }
 
 body {
-  background-color: var(--background);
-  background-image: url('/assets/bg-pattern.svg');
-  background-size: 60px 60px;
-  color: var(--foreground);
   font-family: var(--font-quicksand), sans-serif;
-}
-
-/* Fake Dark Mode trick: If OS prefers dark, we tell the browser we support it, but we force light colors anyway */
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark !important;
-    --background: var(--color-cream);
-    --foreground: var(--color-earth);
-  }
+  overflow-x: hidden;
 }
 
 /* Samsung Internet specific overrides to stop auto-dark mode inversion */
@@ -46,6 +58,175 @@ iframe,
 canvas {
   -webkit-filter: invert(0) !important;
   filter: invert(0) !important;
+}
+
+/* Sakura Petal Animation */
+.petal {
+  position: absolute;
+  background: linear-gradient(135deg, #ffb7c5 0%, #ffc0cb 50%, #ffb6c1 100%);
+  border-radius: 100% 0 100% 0;
+  opacity: 0.8;
+  animation: fall linear infinite;
+  pointer-events: none;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(-10vh) rotate(0deg) translateX(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(110vh) rotate(720deg) translateX(100px);
+    opacity: 0.3;
+  }
+}
+
+/* Floating Animation */
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+/* Cat Ear Bounce */
+.ear-bounce {
+  animation: earBounce 2s ease-in-out infinite;
+}
+
+@keyframes earBounce {
+
+  0%,
+  100% {
+    transform: rotate(-5deg);
+  }
+
+  50% {
+    transform: rotate(5deg);
+  }
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(135deg, #ff6b9d 0%, #c44569 50%, #f8b500 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glassmorphism */
+.glass {
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Button Hover Effects */
+.btn-paw {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.btn-paw:hover {
+  transform: scale(1.05) rotate(-2deg);
+  box-shadow: 0 10px 30px rgba(255, 107, 157, 0.4);
+}
+
+.btn-paw::before {
+  content: '🐾';
+  position: absolute;
+  opacity: 0;
+  transition: all 0.3s ease;
+  right: -20px;
+}
+
+.btn-paw:hover::before {
+  opacity: 1;
+  right: 15px;
+}
+
+/* Card Hover */
+.feature-card {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.feature-card:hover {
+  transform: translateY(-10px) rotate(2deg);
+  box-shadow: 0 20px 40px rgba(255, 182, 193, 0.3);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #fff0f5;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #ffb7c5, #ff6b9d);
+  border-radius: 6px;
+}
+
+/* Paw Print Background Pattern */
+.paw-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 35c-5 0-9-4-9-9s4-9 9-9 9 4 9 9-4 9-9 9zm-12-15c-2 0-4-2-4-4s2-4 4-4 4 2 4 4-2 4-4 4zm24 0c-2 0-4-2-4-4s2-4 4-4 4 2 4 4-2 4-4 4zm-30 8c-2 0-4-2-4-4s2-4 4-4 4 2 4 4-2 4-4 4zm36 0c-2 0-4-2-4-4s2-4 4-4 4 2 4 4-2 4-4 4z' fill='%23ffb7c5' fill-opacity='0.1'/%3E%3C/svg%3E");
+}
+
+/* Blinking Cat Eyes */
+.cat-eye {
+  animation: blink 4s infinite;
+}
+
+@keyframes blink {
+
+  0%,
+  96%,
+  100% {
+    transform: scaleY(1);
+  }
+
+  98% {
+    transform: scaleY(0.1);
+  }
+}
+
+/* Heart Beat */
+.heartbeat {
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  14% {
+    transform: scale(1.1);
+  }
+
+  28% {
+    transform: scale(1);
+  }
+
+  42% {
+    transform: scale(1.1);
+  }
 }
 
 @keyframes sway {
