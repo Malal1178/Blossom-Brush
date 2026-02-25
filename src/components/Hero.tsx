@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useGallery } from './GalleryContext';
-import SakuraBackground from './SakuraBackground';
 
 export default function Hero() {
     const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
@@ -35,8 +34,6 @@ export default function Hero() {
         <div className="font-sans text-pink-800">
             {/* --- Hero Section --- */}
             <section id="home" className="relative pt-32 pb-8 px-6 overflow-hidden">
-                <SakuraBackground />
-
                 {/* Background Decorations */}
                 <div className="absolute top-20 left-10 text-6xl opacity-20 float" style={{ animationDelay: '0s' }}>🌸</div>
                 <div className="absolute top-40 right-20 text-4xl opacity-20 float" style={{ animationDelay: '1s' }}>🌸</div>
@@ -66,7 +63,7 @@ export default function Hero() {
 
                         <div className="flex flex-wrap gap-4">
                             <Link href="/gallery" className="btn-paw bg-gradient-to-r from-pink-400 via-rose-400 to-pink-500 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transform transition-all flex items-center gap-2">
-                                <span>Start Your Journey</span>
+                                <span>View Gallery</span>
                                 <span className="text-2xl">🐾</span>
                             </Link>
                         </div>
