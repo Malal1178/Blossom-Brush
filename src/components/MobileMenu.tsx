@@ -3,7 +3,7 @@
 import { motion, useCycle, Variants } from "framer-motion";
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import { Flower, Home, User, Mail, Palette, MapPin } from "lucide-react";
+import { Flower, Home, User, Mail, Palette } from "lucide-react";
 
 // Colors from globals/theme
 const colors = ["#FFB7C5", "#98FB98", "#5D4037", "#FFD1DC", "#E8DCC4"];
@@ -33,7 +33,6 @@ const Navigation = ({ toggle }: { toggle: () => void }) => (
         {items.map((item, i) => (
             <MenuItem i={i} key={i} item={item} toggle={toggle} />
         ))}
-        <LocationMenuItem />
     </motion.ul>
 );
 
@@ -62,46 +61,6 @@ const MenuItem = ({ i, item, toggle }: { i: number, item: any, toggle: () => voi
                     {item.label}
                 </div>
             </Link>
-        </motion.li>
-    );
-};
-
-const LocationMenuItem = () => {
-    const handleLocationClick = async () => {
-        const locationUrl = 'https://www.google.com/maps/search/?api=1&query=35.6895,139.6917';
-        const locationTitle = 'Visit our Gallery';
-
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: locationTitle,
-                    text: 'Open gallery location in your favorite maps app:',
-                    url: locationUrl,
-                });
-            } catch (error) {
-                console.log('Error sharing', error);
-            }
-        } else {
-            window.open(locationUrl, '_blank');
-        }
-    };
-
-    const border = `2px solid #FFB7C5`;
-
-    return (
-        <motion.li
-            variants={itemVariants}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="flex items-center mb-5 cursor-pointer w-full"
-            onClick={handleLocationClick}
-        >
-            <div className="w-10 h-10 rounded-full flex items-center justify-center mr-5 text-[#5D4037]" style={{ border }}>
-                <MapPin size={20} />
-            </div>
-            <div className="rounded-[5px] h-5 flex-1 text-[#5D4037] font-bold text-lg" style={{ border: "none" }}>
-                Location
-            </div>
         </motion.li>
     );
 };
